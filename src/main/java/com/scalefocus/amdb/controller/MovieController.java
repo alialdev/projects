@@ -1,48 +1,116 @@
 package com.scalefocus.amdb.controller;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.scalefocus.amdb.model.Movie;
 import com.scalefocus.amdb.service.MovieService;
 
 @RestController
 @RequestMapping("/movies")
 public class MovieController {
 
-    private final MovieService movieService;
+	private final MovieService movieService;
 
-    // @Autowired - Field Injection
-    // private MovieService movieService;
+	// @Autowired - Field Injection
+	// private MovieService movieService;
 
-    // @Autowired - Setter Injection
-    // public void setMovieService(MovieService movieService) {
-    //     this.movieService = movieService;
-    // }
-    
-    @Autowired
-    public MovieController(MovieService movieService) {
-        this.movieService = movieService;
-    }
-    
-    @GetMapping("/list")  
-    public String getAllMovies() {
-        return movieService.getAllMovies();
-    }
+	// @Autowired - Setter Injection
+	// public void setMovieService(MovieService movieService) {
+	// this.movieService = movieService;
+	// }
 
-    @PostMapping("/add")  
-    public String addMovie() {
-        return movieService.addMovie();
-    }
-    
-	@DeleteMapping("/delete/{id}")
-	public String deleteMovie(@PathVariable Long id) {
-		return movieService.deleteMovie(id);
+	@Autowired
+	public MovieController(MovieService movieService) {
+		this.movieService = movieService;
 	}
 
-    
+	@GetMapping("/list")
+	public Page<Movie> getAllMovies(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		return movieService.getAllMovies(pageable);
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<Movie> getMovieById(@PathVariable Long id) {
+		Optional<Movie> movie = movieService.getMovieById(id);
+		return movie.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+	}
+
+	@PostMapping("/add")
+	public Movie addMovie(@RequestBody Movie movie) {
+		return movieService.addMovie(movie);
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<Movie> updateMovie(@PathVariable Long id, @RequestBody Movie movieDetails) {
+		Optional<Movie> movie = movieService.getMovieById(id);
+		if (movie.isPresent()) {
+			Movie existingMovie = movie.get();
+	          // Update fields only if they are not null in the request body
+            if (movieDetails.getTitle() != null) {
+                existingMovie.setTitle(movieDetails.getTitle());
+            }
+            if (movieDetails.getDescription() != null) {
+                existingMovie.setDescription(movieDetails.getDescription());
+            }
+            if (movieDetails.getRating() != null) {
+                existingMovie.setRating(movieDetails.getRating());
+            }
+            if (movieDetails.getReleaseDate() != null) {
+                existingMovie.setReleaseDate(movieDetails.getReleaseDate());
+            }
+            if (movieDetails.getDirector() != null) {
+                existingMovie.setDirector(movieDetails.getDirector());
+            }
+            if (movieDetails.getWriter() != null) {
+                existingMovie.setWriter(movieDetails.getWriter());
+            }
+            if (movieDetails.getStars() != null) {
+                existingMovie.setStars(movieDetails.getStars());
+            }
+            if (movieDetails.getDuration() != null) {
+                existingMovie.setDuration(movieDetails.getDuration());
+            }
+            if (movieDetails.getImdbId() != null) {
+                existingMovie.setImdbId(movieDetails.getImdbId());
+            }
+            if (movieDetails.getYear() != null) {
+                existingMovie.setYear(movieDetails.getYear());
+            }
+            existingMovie.setId(id);
+			return ResponseEntity.ok(movieService.addMovie(existingMovie));
+		}
+		return ResponseEntity.notFound().build();
+	}
+
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<Void> deleteMovie(@PathVariable Long id) {
+		movieService.deleteMovie(id);
+		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/search")
+	public Page<Movie> searchMovies(@RequestParam String title,
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		return movieService.searchMovies(title, pageable);
+	}
+
 }
