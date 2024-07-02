@@ -39,9 +39,9 @@ public class TvShowController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<TVShow> getTVShowById(@PathVariable Long id) {
-		Optional<TVShow> tvShow = tvShowService.getTVShowById(id);
-		return tvShow.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+	public Optional<TVShow> getTVShowById(@PathVariable Long id) {
+		return tvShowService.getTVShowById(id);
+
 	}
 
 	@PostMapping("/add")
@@ -53,16 +53,58 @@ public class TvShowController {
 	public ResponseEntity<TVShow> updateTVShow(@PathVariable Long id, @RequestBody TVShow tvShowDetails) {
 		Optional<TVShow> tvShow = tvShowService.getTVShowById(id);
 		if (tvShow.isPresent()) {
-			tvShowDetails.setId(id);
-			return ResponseEntity.ok(tvShowService.addTVShow(tvShowDetails));
+			TVShow existingTVShow = tvShow.get();
+
+			if (tvShowDetails.getTitle() != null) {
+				existingTVShow.setTitle(tvShowDetails.getTitle());
+			}
+			if (tvShowDetails.getDescription() != null) {
+				existingTVShow.setDescription(tvShowDetails.getDescription());
+			}
+			if (tvShowDetails.getRating() != null) {
+				existingTVShow.setRating(tvShowDetails.getRating());
+			}
+			if (tvShowDetails.getReleaseDate() != null) {
+				existingTVShow.setReleaseDate(tvShowDetails.getReleaseDate());
+			}
+			if (tvShowDetails.getDirector() != null) {
+				existingTVShow.setDirector(tvShowDetails.getDirector());
+			}
+			if (tvShowDetails.getWriter() != null) {
+				existingTVShow.setWriter(tvShowDetails.getWriter());
+			}
+			if (tvShowDetails.getStars() != null) {
+				existingTVShow.setStars(tvShowDetails.getStars());
+			}
+			if (tvShowDetails.getDuration() != null) {
+				existingTVShow.setDuration(tvShowDetails.getDuration());
+			}
+			if (tvShowDetails.getImdbId() != null) {
+				existingTVShow.setImdbId(tvShowDetails.getImdbId());
+			}
+			if (tvShowDetails.getYear() != null) {
+				existingTVShow.setYear(tvShowDetails.getYear());
+			}
+
+			if (tvShowDetails.getSeasons() != null) {
+				existingTVShow.setSeasons(tvShowDetails.getSeasons());
+			}
+			if (tvShowDetails.getGenres() != null) {
+				existingTVShow.setGenres(tvShowDetails.getGenres());
+			}
+
+			existingTVShow.setId(id);
+
+			return ResponseEntity.ok(tvShowService.addTVShow(existingTVShow));
+
+		} else {
+			return ResponseEntity.notFound().build();
 		}
-		return ResponseEntity.notFound().build();
 	}
 
 	@DeleteMapping("/delete/{id}")
-	public ResponseEntity<Void> deleteTVShow(@PathVariable Long id) {
+	public void deleteTVShow(@PathVariable Long id) {
 		tvShowService.deleteTVShow(id);
-		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("/search")

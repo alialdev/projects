@@ -47,9 +47,9 @@ public class MovieController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Movie> getMovieById(@PathVariable Long id) {
-		Optional<Movie> movie = movieService.getMovieById(id);
-		return movie.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+	public Optional<Movie> getMovieById(@PathVariable Long id) {
+		return movieService.getMovieById(id);
+	
 	}
 
 	@PostMapping("/add")
@@ -62,7 +62,7 @@ public class MovieController {
 		Optional<Movie> movie = movieService.getMovieById(id);
 		if (movie.isPresent()) {
 			Movie existingMovie = movie.get();
-	          // Update fields only if they are not null in the request body
+	    
             if (movieDetails.getTitle() != null) {
                 existingMovie.setTitle(movieDetails.getTitle());
             }
@@ -100,9 +100,8 @@ public class MovieController {
 	}
 
 	@DeleteMapping("/delete/{id}")
-	public ResponseEntity<Void> deleteMovie(@PathVariable Long id) {
+	public void deleteMovie(@PathVariable Long id) {
 		movieService.deleteMovie(id);
-		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("/search")
