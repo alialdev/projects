@@ -1,43 +1,28 @@
-package com.scalefocus.amdb.model;
+package com.scalefocus.amdb.dto;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
+public class TVShowDto extends MediaDto {
 
-@Entity
-public class TVShow extends Media {
+	private List<TVSeasonDto> seasons;
 
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "tvShow", cascade = CascadeType.ALL)
-	private List<TVSeason> seasons;
+	private Set<GenreDto> genres;
 
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(
-			name = "tv_show_genres",
-			joinColumns = @JoinColumn(name = "tv_show_id"),
-			inverseJoinColumns = @JoinColumn(name = "genre_id"))
-	private Set<Genre> genres;
-
-	public List<TVSeason> getSeasons() {
+	public List<TVSeasonDto> getSeasons() {
 		return seasons;
 	}
 
-	public void setSeasons(List<TVSeason> seasons) {
+	public void setSeasons(List<TVSeasonDto> seasons) {
 		this.seasons = seasons;
 	}
 
-	public Set<Genre> getGenres() {
+	public Set<GenreDto> getGenres() {
 		return genres;
 	}
 
-	public void setGenres(Set<Genre> genres) {
+	public void setGenres(Set<GenreDto> genres) {
 		this.genres = genres;
 	}
 
@@ -55,19 +40,17 @@ public class TVShow extends Media {
 			return true;
 		if (!super.equals(obj))
 			return false;
-		if (!(obj instanceof TVShow))
+		if (!(obj instanceof TVShowDto))
 			return false;
-		TVShow other = (TVShow) obj;
+		TVShowDto other = (TVShowDto) obj;
 		return Objects.equals(genres, other.genres) && Objects.equals(seasons, other.seasons);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("TVShow [id=");
+		builder.append("TVShowDto [id=");
 		builder.append(id);
-		builder.append(", genres=");
-		builder.append(genres);
 		builder.append(", title=");
 		builder.append(title);
 		builder.append(", description=");
@@ -90,6 +73,8 @@ public class TVShow extends Media {
 		builder.append(year);
 		builder.append(", seasons=");
 		builder.append(seasons);
+		builder.append(", genres=");
+		builder.append(genres);
 		builder.append("]");
 		return builder.toString();
 	}

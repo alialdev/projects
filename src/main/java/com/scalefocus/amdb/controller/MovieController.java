@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.scalefocus.amdb.dto.MovieDto;
 import com.scalefocus.amdb.model.Movie;
 import com.scalefocus.amdb.service.MovieService;
 
@@ -40,76 +42,49 @@ public class MovieController {
 	}
 
 	@GetMapping("/list")
-	public Page<Movie> getAllMovies(@RequestParam(defaultValue = "0") int page,
+	public ResponseEntity<Page<MovieDto>> getAllMovies(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size) {
 		Pageable pageable = PageRequest.of(page, size);
-		return movieService.getAllMovies(pageable);
+		Page<MovieDto> result = movieService.getAllMovies(pageable);
+
+		return result.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(result);
 	}
 
 	@GetMapping("/{id}")
-	public Optional<Movie> getMovieById(@PathVariable Long id) {
-		return movieService.getMovieById(id);
-	
+	public ResponseEntity<MovieDto> getMovieById(@PathVariable Long id) {
+		Optional<MovieDto> movie = movieService.getMovieById(id);
+
+		return movie.isPresent() ? ResponseEntity.ok(movie.get()) : ResponseEntity.notFound().build();
 	}
 
 	@PostMapping("/add")
-	public Movie addMovie(@RequestBody Movie movie) {
-		return movieService.addMovie(movie);
+	public ResponseEntity<MovieDto> addMovie(@RequestBody Movie movie) {
+		MovieDto savedMovie = movieService.addMovie(movie);
+		
+		return ResponseEntity.ok(savedMovie);
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Movie> updateMovie(@PathVariable Long id, @RequestBody Movie movieDetails) {
-		Optional<Movie> movie = movieService.getMovieById(id);
-		if (movie.isPresent()) {
-			Movie existingMovie = movie.get();
-	    
-            if (movieDetails.getTitle() != null) {
-                existingMovie.setTitle(movieDetails.getTitle());
-            }
-            if (movieDetails.getDescription() != null) {
-                existingMovie.setDescription(movieDetails.getDescription());
-            }
-            if (movieDetails.getRating() != null) {
-                existingMovie.setRating(movieDetails.getRating());
-            }
-            if (movieDetails.getReleaseDate() != null) {
-                existingMovie.setReleaseDate(movieDetails.getReleaseDate());
-            }
-            if (movieDetails.getDirector() != null) {
-                existingMovie.setDirector(movieDetails.getDirector());
-            }
-            if (movieDetails.getWriter() != null) {
-                existingMovie.setWriter(movieDetails.getWriter());
-            }
-            if (movieDetails.getStars() != null) {
-                existingMovie.setStars(movieDetails.getStars());
-            }
-            if (movieDetails.getDuration() != null) {
-                existingMovie.setDuration(movieDetails.getDuration());
-            }
-            if (movieDetails.getImdbId() != null) {
-                existingMovie.setImdbId(movieDetails.getImdbId());
-            }
-            if (movieDetails.getYear() != null) {
-                existingMovie.setYear(movieDetails.getYear());
-            }
-            existingMovie.setId(id);
-			return ResponseEntity.ok(movieService.addMovie(existingMovie));
-		}
-		return ResponseEntity.notFound().build();
+	public ResponseEntity<MovieDto> updateMovie(@PathVariable Long id, @RequestBody Movie movieDetails) {
+		Optional<MovieDto> updatedMovie = movieService.updateMovie(id, movieDetails);
+		
+		return updatedMovie.isPresent() ? ResponseEntity.ok(updatedMovie.get()) : ResponseEntity.notFound().build();
 	}
 
 	@DeleteMapping("/delete/{id}")
-	public void deleteMovie(@PathVariable Long id) {
+	public ResponseEntity<Void> deleteMovie(@PathVariable Long id) {
 		movieService.deleteMovie(id);
+		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("/search")
-	public Page<Movie> searchMovies(@RequestParam String title,
+	public ResponseEntity<Page<MovieDto>> searchMovies(@RequestParam String title,
 			@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size) {
 		Pageable pageable = PageRequest.of(page, size);
-		return movieService.searchMovies(title, pageable);
+		Page<MovieDto> result = movieService.searchMovies(title, pageable);
+
+		return result.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(result);
 	}
 
 }

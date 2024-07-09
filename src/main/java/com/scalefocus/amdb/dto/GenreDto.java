@@ -1,17 +1,9 @@
-package com.scalefocus.amdb.model;
+package com.scalefocus.amdb.dto;
 
 import java.util.Objects;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+public class GenreDto {
 
-@Entity
-public class Genre {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	private String name;
@@ -41,11 +33,12 @@ public class Genre {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!(obj instanceof Genre))
+		if (!(obj instanceof GenreDto))
 			return false;
-		Genre other = (Genre) obj;
+		GenreDto other = (GenreDto) obj;
 		return Objects.equals(id, other.id)
 				&& Objects.equals(name, other.name);
+
 	}
 
 	@Override

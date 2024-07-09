@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -24,14 +23,15 @@ public class TVSeason {
 
 	private Integer number;
 
-	@ManyToOne
-	@JoinColumn(name = "tv_show_id")
-    @JsonBackReference
-	private TVShow tvShow;
-
 	@OneToMany(mappedBy = "tvSeason", cascade = CascadeType.ALL)
 	private List<TVEpisode> episodes;
 
+	@ManyToOne
+	@JoinColumn(name = "tv_show_id")
+	@JsonBackReference
+	private TVShow tvShow;
+
+	// Getters and Setters
 	public Long getId() {
 		return id;
 	}
@@ -48,20 +48,20 @@ public class TVSeason {
 		this.number = number;
 	}
 
-	public TVShow getTvShow() {
-		return tvShow;
-	}
-
-	public void setTvShow(TVShow tvShow) {
-		this.tvShow = tvShow;
-	}
-
 	public List<TVEpisode> getEpisodes() {
 		return episodes;
 	}
 
 	public void setEpisodes(List<TVEpisode> episodes) {
 		this.episodes = episodes;
+	}
+
+	public TVShow getTvShow() {
+		return tvShow;
+	}
+
+	public void setTvShow(TVShow tvShow) {
+		this.tvShow = tvShow;
 	}
 
 	@Override
@@ -89,10 +89,10 @@ public class TVSeason {
 		builder.append(id);
 		builder.append(", number=");
 		builder.append(number);
-		builder.append(", tvShow=");
-		builder.append(tvShow);
 		builder.append(", episodes=");
 		builder.append(episodes);
+		builder.append(", tvShow=");
+		builder.append(tvShow);
 		builder.append("]");
 		return builder.toString();
 	}

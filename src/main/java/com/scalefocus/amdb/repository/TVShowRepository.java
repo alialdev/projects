@@ -9,5 +9,7 @@ import com.scalefocus.amdb.model.TVShow;
 
 @Repository
 public interface TVShowRepository extends JpaRepository<TVShow, Long> {
-    Page<TVShow> findByTitleContaining(String title, Pageable pageable);
+
+	Page<TVShow> findByTitleContaining(String title, Pageable pageable);
+
 }

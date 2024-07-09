@@ -1,20 +1,10 @@
-package com.scalefocus.amdb.model;
+package com.scalefocus.amdb.dto;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+public class TVEpisodeDto {
 
-@Entity
-public class TVEpisode {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	private String title;
@@ -38,10 +28,6 @@ public class TVEpisode {
 	private Integer year;
 
 	private Integer number;
-
-	@ManyToOne
-	@JoinColumn(name = "tv_season_id")
-	private TVSeason tvSeason;
 
 	public Long getId() {
 		return id;
@@ -139,14 +125,6 @@ public class TVEpisode {
 		this.number = number;
 	}
 
-	public TVSeason getTvSeason() {
-		return tvSeason;
-	}
-
-	public void setTvSeason(TVSeason tvSeason) {
-		this.tvSeason = tvSeason;
-	}
-
 	@Override
 	public int hashCode() {
 		return Objects.hash(description,
@@ -159,7 +137,6 @@ public class TVEpisode {
 			releaseDate,
 			stars,
 			title,
-			tvSeason,
 			writer,
 			year);
 	}
@@ -168,9 +145,9 @@ public class TVEpisode {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!(obj instanceof TVEpisode))
+		if (!(obj instanceof TVEpisodeDto))
 			return false;
-		TVEpisode other = (TVEpisode) obj;
+		TVEpisodeDto other = (TVEpisodeDto) obj;
 		return Objects.equals(description, other.description)
 				&& Objects.equals(director, other.director)
 				&& Objects.equals(duration, other.duration)
@@ -181,7 +158,6 @@ public class TVEpisode {
 				&& Objects.equals(releaseDate, other.releaseDate)
 				&& Objects.equals(stars, other.stars)
 				&& Objects.equals(title, other.title)
-				&& Objects.equals(tvSeason, other.tvSeason)
 				&& Objects.equals(writer, other.writer)
 				&& Objects.equals(year, other.year);
 	}
@@ -213,8 +189,6 @@ public class TVEpisode {
 		builder.append(year);
 		builder.append(", number=");
 		builder.append(number);
-		builder.append(", tvSeason=");
-		builder.append(tvSeason);
 		builder.append("]");
 		return builder.toString();
 	}

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,102 +18,66 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.scalefocus.amdb.dto.TVShowDto;
 import com.scalefocus.amdb.model.TVShow;
-import com.scalefocus.amdb.service.TvShowService;
+import com.scalefocus.amdb.service.TVShowService;
 
 @RestController
 @RequestMapping("/tvshows")
 public class TvShowController {
 
-	private final TvShowService tvShowService;
+	private final TVShowService tvShowService;
 
 	@Autowired
-	public TvShowController(TvShowService tvShowService) {
+	public TvShowController(TVShowService tvShowService) {
 		this.tvShowService = tvShowService;
 	}
 
 	@GetMapping("/list")
-	public Page<TVShow> getAllTVShows(@RequestParam(defaultValue = "0") int page,
+	public ResponseEntity<Page<TVShowDto>> getAllTVShows(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size) {
 		Pageable pageable = PageRequest.of(page, size);
-		return tvShowService.getAllTVShows(pageable);
+		Page<TVShowDto> result = tvShowService.getAllTVShows(pageable);
+
+		return result.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(result);
 	}
 
 	@GetMapping("/{id}")
-	public Optional<TVShow> getTVShowById(@PathVariable Long id) {
-		return tvShowService.getTVShowById(id);
+	public ResponseEntity<TVShowDto> getTVShowById(@PathVariable Long id) {
+		Optional<TVShowDto> tvShow = tvShowService.getTVShowById(id);
 
+		return tvShow.isPresent() ? ResponseEntity.ok(tvShow.get()) : ResponseEntity.notFound().build();
 	}
 
 	@PostMapping("/add")
-	public TVShow addTvShow(@RequestBody TVShow tvShow) {
-		return tvShowService.addTVShow(tvShow);
+	public ResponseEntity<TVShowDto> addTvShow(@RequestBody TVShow tvShow) {
+		TVShowDto savedTvShow = tvShowService.addTVShow(tvShow);
+		
+		return ResponseEntity.ok(savedTvShow);
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<TVShow> updateTVShow(@PathVariable Long id, @RequestBody TVShow tvShowDetails) {
-		Optional<TVShow> tvShow = tvShowService.getTVShowById(id);
-		if (tvShow.isPresent()) {
-			TVShow existingTVShow = tvShow.get();
+	public ResponseEntity<TVShowDto> updateTVShow(@PathVariable Long id, @RequestBody TVShow tvShow) {
+		Optional<TVShowDto> updatedTvShow = tvShowService.updateTVShow(id, tvShow);
 
-			if (tvShowDetails.getTitle() != null) {
-				existingTVShow.setTitle(tvShowDetails.getTitle());
-			}
-			if (tvShowDetails.getDescription() != null) {
-				existingTVShow.setDescription(tvShowDetails.getDescription());
-			}
-			if (tvShowDetails.getRating() != null) {
-				existingTVShow.setRating(tvShowDetails.getRating());
-			}
-			if (tvShowDetails.getReleaseDate() != null) {
-				existingTVShow.setReleaseDate(tvShowDetails.getReleaseDate());
-			}
-			if (tvShowDetails.getDirector() != null) {
-				existingTVShow.setDirector(tvShowDetails.getDirector());
-			}
-			if (tvShowDetails.getWriter() != null) {
-				existingTVShow.setWriter(tvShowDetails.getWriter());
-			}
-			if (tvShowDetails.getStars() != null) {
-				existingTVShow.setStars(tvShowDetails.getStars());
-			}
-			if (tvShowDetails.getDuration() != null) {
-				existingTVShow.setDuration(tvShowDetails.getDuration());
-			}
-			if (tvShowDetails.getImdbId() != null) {
-				existingTVShow.setImdbId(tvShowDetails.getImdbId());
-			}
-			if (tvShowDetails.getYear() != null) {
-				existingTVShow.setYear(tvShowDetails.getYear());
-			}
-
-			if (tvShowDetails.getSeasons() != null) {
-				existingTVShow.setSeasons(tvShowDetails.getSeasons());
-			}
-			if (tvShowDetails.getGenres() != null) {
-				existingTVShow.setGenres(tvShowDetails.getGenres());
-			}
-
-			existingTVShow.setId(id);
-
-			return ResponseEntity.ok(tvShowService.addTVShow(existingTVShow));
-
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		return updatedTvShow.isPresent() ? ResponseEntity.ok(updatedTvShow.get()) : ResponseEntity.notFound().build();
 	}
 
 	@DeleteMapping("/delete/{id}")
-	public void deleteTVShow(@PathVariable Long id) {
+	public ResponseEntity<Void> deleteTVShow(@PathVariable Long id) {
 		tvShowService.deleteTVShow(id);
+
+		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("/search")
-	public Page<TVShow> searchTVShows(@RequestParam String title,
+	public ResponseEntity<Page<TVShowDto>> searchTVShows(@RequestParam String title,
 			@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size) {
 		Pageable pageable = PageRequest.of(page, size);
-		return tvShowService.searchTVShows(title, pageable);
+		Page<TVShowDto> result = tvShowService.searchTVShows(title, pageable);
+
+		return result.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(result);
 	}
 
 }

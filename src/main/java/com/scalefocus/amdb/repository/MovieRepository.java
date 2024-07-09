@@ -9,5 +9,7 @@ import com.scalefocus.amdb.model.Movie;
 
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Long> {
-    Page<Movie> findByTitleContaining(String title, Pageable pageable);
+
+	Page<Movie> findByTitleContaining(String title, Pageable pageable);
+
 }

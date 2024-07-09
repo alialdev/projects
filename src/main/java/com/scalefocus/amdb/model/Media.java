@@ -3,45 +3,37 @@ package com.scalefocus.amdb.model;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MappedSuperclass;
 
-@Entity
-public class TVEpisode {
+@MappedSuperclass
+public abstract class Media {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	protected Long id;
 
-	private String title;
+	protected String title;
 
-	private String description;
+	protected String description;
 
-	private Double rating;
+	protected Double rating;
 
-	private LocalDate releaseDate;
+	protected LocalDate releaseDate;
 
-	private String director;
+	protected String director;
 
-	private String writer;
+	protected String writer;
 
-	private String stars;
+	protected String stars;
 
-	private Integer duration;
+	protected Integer duration;
 
-	private String imdbId;
+	protected String imdbId;
 
-	private Integer year;
-
-	private Integer number;
-
-	@ManyToOne
-	@JoinColumn(name = "tv_season_id")
-	private TVSeason tvSeason;
+	protected Integer year;
 
 	public Long getId() {
 		return id;
@@ -131,22 +123,6 @@ public class TVEpisode {
 		this.year = year;
 	}
 
-	public Integer getNumber() {
-		return number;
-	}
-
-	public void setNumber(Integer number) {
-		this.number = number;
-	}
-
-	public TVSeason getTvSeason() {
-		return tvSeason;
-	}
-
-	public void setTvSeason(TVSeason tvSeason) {
-		this.tvSeason = tvSeason;
-	}
-
 	@Override
 	public int hashCode() {
 		return Objects.hash(description,
@@ -154,12 +130,10 @@ public class TVEpisode {
 			duration,
 			id,
 			imdbId,
-			number,
 			rating,
 			releaseDate,
 			stars,
 			title,
-			tvSeason,
 			writer,
 			year);
 	}
@@ -168,55 +142,20 @@ public class TVEpisode {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!(obj instanceof TVEpisode))
+		if (!(obj instanceof Media))
 			return false;
-		TVEpisode other = (TVEpisode) obj;
+		Media other = (Media) obj;
 		return Objects.equals(description, other.description)
 				&& Objects.equals(director, other.director)
 				&& Objects.equals(duration, other.duration)
 				&& Objects.equals(id, other.id)
 				&& Objects.equals(imdbId, other.imdbId)
-				&& Objects.equals(number, other.number)
 				&& Objects.equals(rating, other.rating)
 				&& Objects.equals(releaseDate, other.releaseDate)
 				&& Objects.equals(stars, other.stars)
 				&& Objects.equals(title, other.title)
-				&& Objects.equals(tvSeason, other.tvSeason)
 				&& Objects.equals(writer, other.writer)
 				&& Objects.equals(year, other.year);
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("TVEpisode [id=");
-		builder.append(id);
-		builder.append(", title=");
-		builder.append(title);
-		builder.append(", description=");
-		builder.append(description);
-		builder.append(", rating=");
-		builder.append(rating);
-		builder.append(", releaseDate=");
-		builder.append(releaseDate);
-		builder.append(", director=");
-		builder.append(director);
-		builder.append(", writer=");
-		builder.append(writer);
-		builder.append(", stars=");
-		builder.append(stars);
-		builder.append(", duration=");
-		builder.append(duration);
-		builder.append(", imdbId=");
-		builder.append(imdbId);
-		builder.append(", year=");
-		builder.append(year);
-		builder.append(", number=");
-		builder.append(number);
-		builder.append(", tvSeason=");
-		builder.append(tvSeason);
-		builder.append("]");
-		return builder.toString();
 	}
 
 }

@@ -1,3 +1,16 @@
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+TRUNCATE TABLE genre;
+TRUNCATE TABLE movie;
+TRUNCATE TABLE tvshow;
+TRUNCATE TABLE tvseason;
+TRUNCATE TABLE tvepisode;
+TRUNCATE TABLE movie_genres;
+TRUNCATE TABLE tv_show_genres;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
 -- Genres
 INSERT IGNORE INTO genre (name) VALUES 
 ('Action'), ('Comedy'), ('Drama');

@@ -1,29 +1,17 @@
-package com.scalefocus.amdb.model;
+package com.scalefocus.amdb.dto;
 
 import java.util.Objects;
 import java.util.Set;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+public class MovieDto extends MediaDto {
 
-@Entity
-public class Movie extends Media {
+	private Set<GenreDto> genres;
 
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(
-			name = "movie_genres",
-			joinColumns = @JoinColumn(name = "movie_id"),
-			inverseJoinColumns = @JoinColumn(name = "genre_id"))
-	private Set<Genre> genres;
-
-	public Set<Genre> getGenres() {
+	public Set<GenreDto> getGenres() {
 		return genres;
 	}
 
-	public void setGenres(Set<Genre> genres) {
+	public void setGenres(Set<GenreDto> genres) {
 		this.genres = genres;
 	}
 
@@ -41,19 +29,19 @@ public class Movie extends Media {
 			return true;
 		if (!super.equals(obj))
 			return false;
-		if (!(obj instanceof Movie))
+		if (!(obj instanceof MovieDto))
 			return false;
-		Movie other = (Movie) obj;
+		MovieDto other = (MovieDto) obj;
 		return Objects.equals(genres, other.genres);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Movie [genres=");
-		builder.append(genres);
-		builder.append(", id=");
+		builder.append("MovieDto [id=");
 		builder.append(id);
+		builder.append(", genres=");
+		builder.append(genres);
 		builder.append(", title=");
 		builder.append(title);
 		builder.append(", description=");
