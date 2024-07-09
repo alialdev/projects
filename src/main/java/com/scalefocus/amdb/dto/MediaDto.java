@@ -3,7 +3,7 @@ package com.scalefocus.amdb.dto;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class MediaDto {
+public abstract class MediaDto {
 
 	protected Long id;
 
@@ -148,35 +148,6 @@ public class MediaDto {
 				&& Objects.equals(title, other.title)
 				&& Objects.equals(writer, other.writer)
 				&& Objects.equals(year, other.year);
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("MediaDto [id=");
-		builder.append(id);
-		builder.append(", title=");
-		builder.append(title);
-		builder.append(", description=");
-		builder.append(description);
-		builder.append(", rating=");
-		builder.append(rating);
-		builder.append(", releaseDate=");
-		builder.append(releaseDate);
-		builder.append(", director=");
-		builder.append(director);
-		builder.append(", writer=");
-		builder.append(writer);
-		builder.append(", stars=");
-		builder.append(stars);
-		builder.append(", duration=");
-		builder.append(duration);
-		builder.append(", imdbId=");
-		builder.append(imdbId);
-		builder.append(", year=");
-		builder.append(year);
-		builder.append("]");
-		return builder.toString();
 	}
 
 }
