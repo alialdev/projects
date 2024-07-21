@@ -10,8 +10,8 @@ import com.scalefocus.amdb.model.TVShow;
 })
 public interface TVShowMapper {
 
-	TVShowDto tvShowToTvShowDto(TVShow tvShow);
+	TVShowDto tvShowToTVShowDto(TVShow tvShow);
 
-	TVShow tvShowDtoToTvShow(TVShowDto tvShowDto);
+	TVShow tvShowDtoToTVShow(TVShowDto tvShowDto);
 
 }
