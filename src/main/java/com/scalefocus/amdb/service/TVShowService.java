@@ -170,7 +170,6 @@ public class TVShowService implements MediaService<TVShowDto> {
 					&& filterByTitleStartingWith.apply(tvShow, titleStart))
 			.map(tvShowMapper::tvShowToTVShowDto)
 			.collect(Collectors.toList());
-
 	}
 
 }
