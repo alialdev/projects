@@ -119,5 +119,11 @@ public class TVShowController {
 		return tvShowsByGenreAndTitle.isEmpty() ? ResponseEntity.notFound().build()
 				: ResponseEntity.ok(tvShowsByGenreAndTitle);
 	}
+	
+    @PostMapping("/import")
+    public ResponseEntity<String> importTVShows() {
+        tvShowService.insertTvShowsFromApiAsync();
+        return ResponseEntity.ok("TV shows import started and will be processed in the background.");
+    }
 
 }

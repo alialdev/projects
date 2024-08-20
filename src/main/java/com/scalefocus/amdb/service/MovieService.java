@@ -10,9 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.scalefocus.amdb.client.SimulatedApiClient;
 import com.scalefocus.amdb.dto.MovieDto;
 import com.scalefocus.amdb.mapper.MovieMapper;
 import com.scalefocus.amdb.model.Movie;
@@ -21,11 +23,22 @@ import com.scalefocus.amdb.repository.MovieRepository;
 @Service
 public class MovieService implements MediaService<MovieDto> {
 
-	@Autowired
 	private MovieRepository movieRepository;
 
-	@Autowired
 	private MovieMapper movieMapper;
+
+	private SimulatedApiClient simulatedApiClient;
+
+	@Autowired
+	public MovieService(MovieRepository movieRepository, MovieMapper movieMapper) {
+		this.movieRepository = movieRepository;
+		this.movieMapper = movieMapper;
+	}
+
+	@Autowired
+	public void setSimulatedApiClient(SimulatedApiClient simulatedApiClient) {
+		this.simulatedApiClient = simulatedApiClient;
+	}
 
 	public Page<MovieDto> getAll(Pageable pageable) {
 		Page<Movie> movies = movieRepository.findAll(pageable);
@@ -118,7 +131,7 @@ public class MovieService implements MediaService<MovieDto> {
 		return movieRepository.findAll()
 			.stream()
 			.sorted(Comparator.comparing(Movie::getRating).reversed())
-			.limit(3)
+			.limit(limit)
 			.map(movieMapper::movieToMovieDto)
 			.collect(Collectors.toList());
 	}
@@ -154,6 +167,11 @@ public class MovieService implements MediaService<MovieDto> {
 			.map(movieMapper::movieToMovieDto)
 			.collect(Collectors.toList());
 
+	}
+
+	@Async
+	public void insertMoviesFromApiAsync() {
+		simulatedApiClient.insertMoviesFromApi();
 	}
 
 }

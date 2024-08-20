@@ -9,9 +9,11 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.scalefocus.amdb.client.SimulatedApiClient;
 import com.scalefocus.amdb.dto.TVShowDto;
 import com.scalefocus.amdb.dto.TVShowDto;
 import com.scalefocus.amdb.mapper.TVShowMapper;
@@ -24,11 +26,22 @@ import com.scalefocus.amdb.repository.TVShowRepository;
 @Service
 public class TVShowService implements MediaService<TVShowDto> {
 
-	@Autowired
 	private TVShowRepository tvShowRepository;
 
-	@Autowired
 	private TVShowMapper tvShowMapper;
+
+	private SimulatedApiClient simulatedApiClient;
+
+	@Autowired
+	public TVShowService(TVShowRepository tvShowRepository, TVShowMapper tvShowMapper) {
+		this.tvShowRepository = tvShowRepository;
+		this.tvShowMapper = tvShowMapper;
+	}
+
+	@Autowired
+	public void setSimulatedApiClient(SimulatedApiClient simulatedApiClient) {
+		this.simulatedApiClient = simulatedApiClient;
+	}
 
 	public Page<TVShowDto> getAll(Pageable pageable) {
 		Page<TVShow> tvShows = tvShowRepository.findAll(pageable);
@@ -111,7 +124,6 @@ public class TVShowService implements MediaService<TVShowDto> {
 		tvShowRepository.delete(tvShow);
 	}
 
-	@Transactional
 	public void delete(String imdbId) {
 		tvShowRepository.deleteByImdbId(imdbId);
 	}
@@ -170,6 +182,11 @@ public class TVShowService implements MediaService<TVShowDto> {
 					&& filterByTitleStartingWith.apply(tvShow, titleStart))
 			.map(tvShowMapper::tvShowToTVShowDto)
 			.collect(Collectors.toList());
+	}
+
+	@Async
+	public void insertTvShowsFromApiAsync() {
+		simulatedApiClient.insertTVShowsFromApi();
 	}
 
 }

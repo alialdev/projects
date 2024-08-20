@@ -126,5 +126,11 @@ public class MovieController {
 		return moviesByGenreAndTitle.isEmpty() ? ResponseEntity.notFound().build()
 				: ResponseEntity.ok(moviesByGenreAndTitle);
 	}
+	
+    @PostMapping("/import")
+    public ResponseEntity<String> importMovies() {
+        movieService.insertMoviesFromApiAsync();
+        return ResponseEntity.ok("Movies import started and will be processed in the background");
+    }
 
 }
