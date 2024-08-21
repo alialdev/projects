@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication
 @ComponentScan(basePackages = "com.scalefocus.amdb")
 @EnableJpaRepositories(basePackages = "com.scalefocus.amdb.repository")
-@EnableAsync
+@EnableAsync(proxyTargetClass = true)
 public class AmdbApplication {
 
 	public static void main(String[] args) {

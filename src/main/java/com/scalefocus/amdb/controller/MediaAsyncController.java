@@ -1,5 +1,6 @@
 package com.scalefocus.amdb.controller;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -52,10 +53,18 @@ public class MediaAsyncController {
 				System.err.println("Error fetching movies: " + ex.getMessage());
 				return Collections.emptyList();
 			});
+		
+		System.out.println("Task is started at :" +Instant.now());
 
-		return Stream.concat(
+		List<String> media= Stream.concat(
 			tvShowsFuture.join().stream(),
 			moviesFuture.join().stream()).collect(Collectors.toList());
+		
+		System.out.println("Task is finished at :" +Instant.now());
+		
+		return media;
+
+		
 	}
 
 }
