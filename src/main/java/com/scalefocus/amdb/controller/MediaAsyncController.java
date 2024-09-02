@@ -4,12 +4,12 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +21,8 @@ import com.scalefocus.amdb.dto.TVShowDto;
 @RestController
 @RequestMapping("/media")
 public class MediaAsyncController {
+
+	private static final Logger logger = LoggerFactory.getLogger(MediaAsyncController.class);
 
 	private final SimulatedApiClient simulatedApiClient;
 
@@ -38,7 +40,7 @@ public class MediaAsyncController {
 		})
 			.completeOnTimeout(Collections.emptyList(), 4, TimeUnit.SECONDS)
 			.exceptionally(ex -> {
-				System.err.println("Error fetching TV shows: " + ex.getMessage());
+				logger.error("Error fetching TV shows: {}", ex.getMessage());
 				return Collections.emptyList();
 			});
 
@@ -49,22 +51,21 @@ public class MediaAsyncController {
 				.collect(Collectors.toList());
 		})
 			.completeOnTimeout(Collections.emptyList(), 4, TimeUnit.SECONDS)
-			.exceptionally(ex -> {				
-				System.err.println("Error fetching movies: " + ex.getMessage());
+			.exceptionally(ex -> {
+				logger.error("Error fetching movies: {}", ex.getMessage());
 				return Collections.emptyList();
 			});
-		
-		System.out.println("Task is started at :" +Instant.now());
 
-		List<String> media= Stream.concat(
+		logger.info("Task started at: {}", Instant.now());
+
+		List<String> media = Stream.concat(
 			tvShowsFuture.join().stream(),
 			moviesFuture.join().stream()).collect(Collectors.toList());
-		
-		System.out.println("Task is finished at :" +Instant.now());
-		
+
+		logger.info("Task finished at: {}", Instant.now());
+
 		return media;
 
-		
 	}
 
 }

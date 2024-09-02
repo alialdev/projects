@@ -1,30 +1,31 @@
 package com.scalefocus.amdb.service;
 
+import java.lang.reflect.Field;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.scalefocus.amdb.client.SimulatedApiClient;
-import com.scalefocus.amdb.dto.TVShowDto;
+import com.scalefocus.amdb.dto.MediaDto;
 import com.scalefocus.amdb.dto.TVShowDto;
 import com.scalefocus.amdb.mapper.TVShowMapper;
-import com.scalefocus.amdb.mapper.TVShowMapper;
 import com.scalefocus.amdb.model.TVShow;
-import com.scalefocus.amdb.model.TVShow;
-import com.scalefocus.amdb.repository.TVShowRepository;
 import com.scalefocus.amdb.repository.TVShowRepository;
 
 @Service
 public class TVShowService implements MediaService<TVShowDto> {
+
+	private static final Logger logger = LoggerFactory.getLogger(TVShowService.class);
 
 	private TVShowRepository tvShowRepository;
 
@@ -74,48 +75,56 @@ public class TVShowService implements MediaService<TVShowDto> {
 
 	@Override
 	public Optional<TVShowDto> update(Long id, TVShowDto tvShowDetails) {
-		Optional<TVShow> tvShow = tvShowRepository.findById(id);
-		if (tvShow.isPresent()) {
-			TVShow existingTVShow = tvShow.get();
+		Optional<TVShow> tvShowOptional = tvShowRepository.findById(id);
+		if (tvShowOptional.isPresent()) {
+			TVShow existingTVShow = tvShowOptional.get();
 
-			if (tvShowDetails.getTitle() != null) {
-				existingTVShow.setTitle(tvShowDetails.getTitle());
-			}
-			if (tvShowDetails.getDescription() != null) {
-				existingTVShow.setDescription(tvShowDetails.getDescription());
-			}
-			if (tvShowDetails.getRating() != null) {
-				existingTVShow.setRating(tvShowDetails.getRating());
-			}
-			if (tvShowDetails.getReleaseDate() != null) {
-				existingTVShow.setReleaseDate(tvShowDetails.getReleaseDate());
-			}
-			if (tvShowDetails.getDirector() != null) {
-				existingTVShow.setDirector(tvShowDetails.getDirector());
-			}
-			if (tvShowDetails.getWriter() != null) {
-				existingTVShow.setWriter(tvShowDetails.getWriter());
-			}
-			if (tvShowDetails.getStars() != null) {
-				existingTVShow.setStars(tvShowDetails.getStars());
-			}
-			if (tvShowDetails.getDuration() != null) {
-				existingTVShow.setDuration(tvShowDetails.getDuration());
-			}
-			if (tvShowDetails.getImdbId() != null) {
-				existingTVShow.setImdbId(tvShowDetails.getImdbId());
-			}
-			if (tvShowDetails.getYear() != null) {
-				existingTVShow.setYear(tvShowDetails.getYear());
-			}
+			// Update fields from TVShowDto
+			updateFields(TVShowDto.class, existingTVShow, tvShowDetails);
+
+			// Update fields from MediaDto
+			updateFields(MediaDto.class, existingTVShow, tvShowDetails);
 
 			TVShow updatedTVShow = tvShowRepository.save(existingTVShow);
-
 			TVShowDto updatedTVShowDto = tvShowMapper.tvShowToTVShowDto(updatedTVShow);
 
 			return Optional.of(updatedTVShowDto);
 		}
 		return Optional.empty();
+	}
+
+	private void updateFields(Class<?> dtoClass, TVShow existingTVShow, TVShowDto tvShowDetails) {
+		for (Field dtoField : dtoClass.getDeclaredFields()) {
+			dtoField.setAccessible(true);
+			try {
+				Object value = dtoField.get(tvShowDetails);
+
+				if (value != null) {
+
+					Field tvShowField = findFieldInClassHierarchy(TVShow.class, dtoField.getName());
+					if (tvShowField != null) {
+						tvShowField.setAccessible(true);
+						tvShowField.set(existingTVShow, value);
+					} else {
+						logger.error("No such field '{}' in TVShow class for corresponding field in TVShowDto",
+							dtoField.getName());
+					}
+				}
+			} catch (IllegalAccessException e) {
+				logger.error("Illegal access to field: {}", dtoField.getName(), e);
+			}
+		}
+	}
+
+	private Field findFieldInClassHierarchy(Class<?> dtoClass, String fieldName) {
+		while (dtoClass != null) {
+			try {
+				return dtoClass.getDeclaredField(fieldName);
+			} catch (NoSuchFieldException e) {
+				dtoClass = dtoClass.getSuperclass();
+			}
+		}
+		return null;
 	}
 
 	@Override

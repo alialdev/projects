@@ -11,6 +11,18 @@ public class TVSeasonDto {
 
 	private List<TVEpisodeDto> episodes;
 
+	public TVSeasonDto() {
+	}
+
+	public TVSeasonDto(TVSeasonDtoBuilder builder) {
+
+		this.id = builder.id;
+
+		this.number = builder.number;
+
+		this.episodes = builder.episodes;
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -63,6 +75,34 @@ public class TVSeasonDto {
 		builder.append(episodes);
 		builder.append("]");
 		return builder.toString();
+	}
+
+	public static class TVSeasonDtoBuilder {
+
+		private Long id;
+
+		private Integer number;
+		private List<TVEpisodeDto> episodes;
+
+		public TVSeasonDtoBuilder id(Long id) {
+			this.id = id;
+			return this;
+		}
+
+		public TVSeasonDtoBuilder number(Integer number) {
+			this.number = number;
+			return this;
+		}
+
+		public TVSeasonDtoBuilder episodes(List<TVEpisodeDto> episodes) {
+			this.episodes = episodes;
+			return this;
+		}
+
+		public TVSeasonDto build() {
+			return new TVSeasonDto(this);
+		}
+
 	}
 
 }

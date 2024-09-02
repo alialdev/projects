@@ -27,6 +27,34 @@ public abstract class MediaDto {
 
 	protected Integer year;
 
+	protected MediaDto() {
+	}
+
+	protected MediaDto(MediaDtoBuilder<?> builder) {
+
+		this.id = builder.id;
+
+		this.title = builder.title;
+
+		this.description = builder.description;
+
+		this.rating = builder.rating;
+
+		this.releaseDate = builder.releaseDate;
+
+		this.director = builder.director;
+
+		this.writer = builder.writer;
+
+		this.stars = builder.stars;
+
+		this.duration = builder.duration;
+
+		this.imdbId = builder.imdbId;
+
+		this.year = builder.year;
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -148,6 +176,88 @@ public abstract class MediaDto {
 				&& Objects.equals(title, other.title)
 				&& Objects.equals(writer, other.writer)
 				&& Objects.equals(year, other.year);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static class MediaDtoBuilder<T extends MediaDtoBuilder<T>> {
+
+		private Long id;
+
+		private String title;
+
+		private String description;
+
+		private Double rating;
+
+		private LocalDate releaseDate;
+
+		private String director;
+
+		private String writer;
+
+		private String stars;
+
+		private Integer duration;
+
+		private String imdbId;
+
+		private Integer year;
+
+		public T id(Long id) {
+			this.id = id;
+			return (T) this;
+		}
+
+		public T title(String title) {
+			this.title = title;
+			return (T) this;
+		}
+
+		public T description(String description) {
+			this.description = description;
+			return (T) this;
+		}
+
+		public T rating(Double rating) {
+			this.rating = rating;
+			return (T) this;
+		}
+
+		public T releaseDate(LocalDate releaseDate) {
+			this.releaseDate = releaseDate;
+			return (T) this;
+		}
+
+		public T director(String director) {
+			this.director = director;
+			return (T) this;
+		}
+
+		public T writer(String writer) {
+			this.writer = writer;
+			return (T) this;
+		}
+
+		public T stars(String stars) {
+			this.stars = stars;
+			return (T) this;
+		}
+
+		public T duration(Integer duration) {
+			this.duration = duration;
+			return (T) this;
+		}
+
+		public T imdbId(String imdbId) {
+			this.imdbId = imdbId;
+			return (T) this;
+		}
+
+		public T year(Integer year) {
+			this.year = year;
+			return (T) this;
+		}
+
 	}
 
 }

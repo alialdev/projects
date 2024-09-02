@@ -7,6 +7,14 @@ public class MovieDto extends MediaDto {
 
 	private Set<GenreDto> genres;
 
+	public MovieDto() {
+	}
+
+	public MovieDto(MovieDtoBuilder builder) {
+		super(builder);
+		this.genres = builder.genres;
+	}
+
 	public Set<GenreDto> getGenres() {
 		return genres;
 	}
@@ -64,6 +72,21 @@ public class MovieDto extends MediaDto {
 		builder.append(year);
 		builder.append("]");
 		return builder.toString();
+	}
+
+	public static class MovieDtoBuilder extends MediaDtoBuilder<MovieDtoBuilder> {
+
+		private Set<GenreDto> genres;
+
+		public MovieDtoBuilder genres(Set<GenreDto> genres) {
+			this.genres = genres;
+			return this;
+		}
+
+		public MovieDto build() {
+			return new MovieDto(this);
+		}
+
 	}
 
 }

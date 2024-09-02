@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.scalefocus.amdb.dto.MovieDto;
-import com.scalefocus.amdb.model.Movie;
 import com.scalefocus.amdb.service.MovieService;
 
 @RestController
@@ -54,7 +52,6 @@ public class MovieController {
 	@GetMapping("/{id}")
 	public ResponseEntity<MovieDto> getMovie(@PathVariable String id) {
 		Optional<MovieDto> movie;
-
 		try {
 			Long movieId = Long.parseLong(id);
 			movie = movieService.get(movieId);
@@ -68,7 +65,6 @@ public class MovieController {
 	@PostMapping()
 	public ResponseEntity<MovieDto> addMovie(@RequestBody MovieDto movie) {
 		MovieDto savedMovie = movieService.add(movie);
-
 		return ResponseEntity.ok(savedMovie);
 	}
 
@@ -80,7 +76,7 @@ public class MovieController {
 	}
 
 	@DeleteMapping("/{imdbId}")
-	public ResponseEntity<Void> deleteTVShow(@PathVariable String imdbId) {
+	public ResponseEntity<Void> deleteMovie(@PathVariable String imdbId) {
 		movieService.delete(imdbId);
 		return ResponseEntity.noContent().build();
 	}
@@ -126,11 +122,11 @@ public class MovieController {
 		return moviesByGenreAndTitle.isEmpty() ? ResponseEntity.notFound().build()
 				: ResponseEntity.ok(moviesByGenreAndTitle);
 	}
-	
-    @PostMapping("/import")
-    public ResponseEntity<String> importMovies() {
-        movieService.insertMoviesFromApiAsync();
-        return ResponseEntity.ok("Movies import started and will be processed in the background");
-    }
+
+	@PostMapping("/import")
+	public ResponseEntity<String> importMovies() {
+		movieService.insertMoviesFromApiAsync();
+		return ResponseEntity.ok("Movies import started and will be processed in the background");
+	}
 
 }

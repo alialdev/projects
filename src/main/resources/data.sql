@@ -24,6 +24,7 @@ INSERT IGNORE INTO movie (title, description, rating, release_date, director, wr
 ('Dunkirk', 'Allied soldiers are evacuated from Dunkirk.', 7.9, '2017-07-21', 'Christopher Nolan', 'Christopher Nolan', 'Fionn Whitehead, Barry Keoghan, Mark Rylance', 106, 'tt5013056', 2017),
 ('Tenet', 'A protagonist fights for the survival of the world.', 7.4, '2020-08-26', 'Christopher Nolan', 'Christopher Nolan', 'John David Washington, Robert Pattinson, Elizabeth Debicki', 150, 'tt6723592', 2020);
 
+
 -- TV Shows
 INSERT IGNORE INTO tvshow (title, description, rating, release_date, director, writer, stars, duration, imdb_id, year) VALUES 
 ('Breaking Bad', 'High school teacher gone wild', 9.5, '2008-01-20', 'Vince Gilligan', 'Vince Gilligan', 'Bryan Cranston, Aaron Paul, Anna Gunn', 47, 'tt0903747', 2008),

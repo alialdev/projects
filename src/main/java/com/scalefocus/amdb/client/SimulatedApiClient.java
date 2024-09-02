@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,17 +27,27 @@ import com.scalefocus.amdb.repository.TVShowRepository;
 @Component
 public class SimulatedApiClient {
 
-	@Autowired
-	private MovieRepository movieRepository;
+	private static final Logger logger = LoggerFactory.getLogger(SimulatedApiClient.class);
 
-	@Autowired
-	private TVShowRepository tvShowRepository;
+	private final MovieRepository movieRepository;
 
-	@Autowired
-	private MovieMapper movieMapper;
+	private final TVShowRepository tvShowRepository;
 
+	private final MovieMapper movieMapper;
+
+	private final TVShowMapper tvShowMapper;
+
+	// Constructor for dependency injection
 	@Autowired
-	private TVShowMapper tvShowMapper;
+	public SimulatedApiClient(MovieRepository movieRepository,
+			TVShowRepository tvShowRepository,
+			MovieMapper movieMapper,
+			TVShowMapper tvShowMapper) {
+		this.movieRepository = movieRepository;
+		this.tvShowRepository = tvShowRepository;
+		this.movieMapper = movieMapper;
+		this.tvShowMapper = tvShowMapper;
+	}
 
 	// Method to simulate insertion of movies from API
 	public void insertMoviesFromApi() {
@@ -46,8 +58,8 @@ public class SimulatedApiClient {
 				// Thread.sleep(2000);
 				TimeUnit.SECONDS.sleep(2); // More readable and flexible
 			} catch (InterruptedException e) {
-				// It’s recommended to call Thread.currentThread().interrupt() to allow higher-level methods 
-				//or thread management systems to detect and handle the
+				// It’s recommended to call Thread.currentThread().interrupt() to allow higher-level methods
+				// or thread management systems to detect and handle the
 				// interrupt properly.
 				Thread.currentThread().interrupt();
 				throw new RuntimeException("Sleep interrupted", e);
@@ -59,8 +71,7 @@ public class SimulatedApiClient {
 
 			// Save the movie
 			movieRepository.save(movie);
-
-			System.out.println("Inserted Movie: " + movie.getTitle());
+			logger.info("Inserted Movie: {}", movie.getTitle());
 		}
 	}
 
@@ -77,56 +88,61 @@ public class SimulatedApiClient {
 
 			TVShow tvShow = tvShowMapper.tvShowDtoToTVShow(tvShowDto);
 
-			if (tvShowRepository.findByImdbId(tvShow.getImdbId()) != null) {
-				tvShowRepository.deleteByImdbId(tvShow.getImdbId());
-			}
+			Optional<TVShow> existingTVShow = tvShowRepository.findByImdbId(tvShow.getImdbId());
+			existingTVShow.ifPresent(m -> tvShowRepository.deleteByImdbId(m.getImdbId()));
 
 			tvShowRepository.save(tvShow);
-			System.out.println("Inserted TV Show: " + tvShow.getTitle());
+			logger.info("Inserted TV Show: {}", tvShow.getTitle());
 		}
 	}
 
 	public List<MovieDto> getMoviesFromApi() {
 
 		List<MovieDto> movies = new ArrayList<>();
-		movies.add(createMovieDto(7L,
-			"Inception",
-			"Dream within a dream within a dream within a dreadm.",
-			8.8,
-			LocalDate.of(2010, 7, 16),
-			"Christopher Nolan",
-			"Christopher Nolan",
-			"Leonardo D",
-			148,
-			"tt1375666",
-			2010,
-			Set.of(createGenreDto(1L, "Action"))));
-		
-		movies.add(createMovieDto(8L,
-			"The Matrix",
-			"Blue Pill or Red Pill",
-			8.7,
-			LocalDate.of(1999, 3, 31),
-			"Wachowski's",
-			"Wachowski's",
-			"John Wick, Morpheus",
-			136,
-			"tt0133093",
-			1999,
-			Set.of(createGenreDto(2L, "Sci-Fi"))));
-		
-		movies.add(createMovieDto(9L,
-			"Interstellar",
-			"Good Movie, Lame Ending",
-			8.6,
-			LocalDate.of(2014, 11, 7),
-			"Christopher Nolan",
-			"Nolan Brothers",
-			"That guy, that women",
-			169,
-			"tt0816692",
-			2014,
-			Set.of(createGenreDto(3L, "Drama"))));
+		movies.add(new MovieDto.MovieDtoBuilder()
+			.id(7L)
+			.title("Inception")
+			.description("Dream within a dream within a dream within a dreadm.")
+			.rating(8.8)
+			.releaseDate(LocalDate.of(2010, 7, 16))
+			.director("Christopher Nolan")
+			.writer("Christopher Nolan")
+			.stars("Leonardo D")
+			.duration(148)
+			.imdbId("tt1375666")
+			.year(2010)
+			.genres(Set.of(new GenreDto.Builder().id(1L).name("Action").build()))
+			.build());
+
+		movies.add(new MovieDto.MovieDtoBuilder()
+			.id(8L)
+			.title("The Matrix")
+			.description("Blue Pill or Red Pill")
+			.rating(8.7)
+			.releaseDate(LocalDate.of(1999, 3, 31))
+			.director("Wachowski's")
+			.writer("Wachowski's")
+			.stars("John Wick, Morpheus")
+			.duration(136)
+			.imdbId("tt0133093")
+			.year(1999)
+			.genres(Set.of(new GenreDto.Builder().id(2L).name("Sci-Fi").build()))
+			.build());
+
+		movies.add(new MovieDto.MovieDtoBuilder()
+			.id(9L)
+			.title("Interstellar")
+			.description("Good Movie, Lame Ending")
+			.rating(8.6)
+			.releaseDate(LocalDate.of(2014, 11, 7))
+			.director("Christopher Nolan")
+			.writer("Nolan Brothers")
+			.stars("That guy, that women")
+			.duration(169)
+			.imdbId("tt0816692")
+			.year(2014)
+			.genres(Set.of(new GenreDto.Builder().id(3L).name("Drama").build()))
+			.build());
 
 		try {
 			TimeUnit.SECONDS.sleep(3);
@@ -136,83 +152,98 @@ public class SimulatedApiClient {
 		}
 
 		return movies;
+
 	}
 
 	public List<TVShowDto> getTVShowsFromApi() {
-		
+
 		List<TVShowDto> tvShows = new ArrayList<>();
-		
-		TVSeasonDto season1 = createTVSeasonDto(1L,
-			1,
-			List.of(createTVEpisodeDto(1L,
-				"Pilot",
-				"Sherlock Holmes.",
-				9.0,
-				LocalDate.of(2010, 7, 25),
-				"Some British Dude",
-				"Other British Dude",
-				"Benedict Cucumber",
-				88,
-				"tt1877051",
-				2010,
-				1)));
-		
-		TVSeasonDto season2 = createTVSeasonDto(2L,
-			2,
-			List.of(createTVEpisodeDto(2L,
-				"The Pilot",
-				"Welcome to post-apocalypse.",
-				8.8,
-				LocalDate.of(2016, 7, 2),
-				"N.C",
-				"N.C",
-				"S.P",
-				60,
-				"tt5435294",
-				2016,
-				2)));
-		
-		tvShows.add(createTVShowDto(7L,
-			"Sherlock",
-			"Sherlock Holmes stories.",
-			9.1,
-			LocalDate.of(2010, 7, 25),
-			"Some British Dude",
-			"Other British Dude",
-			"Benedict Cucumber",
-			60,
-			"tt2076687",
-			2010,
-			List.of(season1),
-			Set.of(createGenreDto(1L, "Drama"))));
-		
-		tvShows.add(createTVShowDto(8L,
-			"Westworld",
-			"A.I gone mad.",
-			8.6,
-			LocalDate.of(2016, 10, 2),
-			"JN",
-			"JN",
-			"ERW",
-			60,
-			"tt0475784",
-			2016,
-			List.of(season2),
-			Set.of(createGenreDto(2L, "Sci-Fi"))));
-		
-		tvShows.add(createTVShowDto(9L,
-			"The Crown",
-			"Queen Elizabeth alives",
-			8.7,
-			LocalDate.of(2016, 11, 4),
-			"Someone",
-			"Someone",
-			"Someone",
-			58,
-			"tt5555260",
-			2016,
-			List.of(),
-			Set.of(createGenreDto(3L, "History"))));
+
+		TVSeasonDto season1 = new TVSeasonDto.TVSeasonDtoBuilder()
+			.id(1L)
+			.number(1)
+			.episodes(List.of(new TVEpisodeDto.TVEpisodeDtoBuilder()
+				.id(1L)
+				.title("Pilot")
+				.description("Sherlock Holmes.")
+				.rating(9.0)
+				.releaseDate(LocalDate.of(2010, 7, 25))
+				.director("Some British Dude")
+				.writer("Other British Dude")
+				.stars("Benedict Cucumber")
+				.duration(88)
+				.imdbId("tt1877051")
+				.year(2010)
+				.number(1)
+				.build()))
+			.build();
+
+		TVSeasonDto season2 = new TVSeasonDto.TVSeasonDtoBuilder()
+			.id(2L)
+			.number(2)
+			.episodes(List.of(new TVEpisodeDto.TVEpisodeDtoBuilder()
+				.id(2L)
+				.title("The Pilot")
+				.description("Welcome to post-apocalypse.")
+				.rating(8.8)
+				.releaseDate(LocalDate.of(2016, 7, 2))
+				.director("N.C")
+				.writer("N.C")
+				.stars("S.P")
+				.duration(60)
+				.imdbId("tt1234567")
+				.year(2016)
+				.number(2)
+				.build()))
+			.build();
+
+		tvShows.add(new TVShowDto.TVShowDtoBuilder()
+			.id(7L)
+			.title("Sherlock")
+			.description("Modern-day Sherlock Holmes.")
+			.rating(9.1)
+			.releaseDate(LocalDate.of(2010, 7, 25))
+			.director("Some British Dude")
+			.writer("Other British Dude")
+			.stars("Benedict Cucumber")
+			.duration(60)
+			.imdbId("tt2076687")
+			.year(2010)
+			.seasons(List.of(season1, season2))
+			.genres(Set.of(new GenreDto.Builder().id(3L).name("Drama").build()))
+			.build());
+
+		tvShows.add(new TVShowDto.TVShowDtoBuilder()
+			.id(8L)
+			.title("Westworld")
+			.description("A.I gone mad.")
+			.rating(8.6)
+			.releaseDate(LocalDate.of(2016, 10, 2))
+			.director("JN")
+			.writer("JN")
+			.stars("ERW")
+			.duration(60)
+			.imdbId("tt047578")
+			.year(2016)
+			.seasons(List.of(season2))
+			.genres(Set.of(new GenreDto.Builder().id(2L).name("Sci-Fi").build()))
+			.build());
+
+		tvShows.add(new TVShowDto.TVShowDtoBuilder()
+			.id(9L)
+			.title("The Crown")
+			.description("Queen Elizabeth alives")
+			.rating(8.7)
+			.releaseDate(LocalDate.of(2016, 11, 4))
+			.director("Someone")
+			.writer("Someone")
+			.stars("Someone")
+			.duration(58)
+			.imdbId("tt5555260")
+			.year(2016)
+			.seasons(List.of(season1))
+			.genres(Set.of(new GenreDto.Builder().id(3L).name("Drama").build()))
+			.build());
 
 		try {
 			TimeUnit.SECONDS.sleep(3);
@@ -222,108 +253,6 @@ public class SimulatedApiClient {
 		}
 
 		return tvShows;
-	}
-
-	private GenreDto createGenreDto(Long id, String name) {
-		GenreDto genre = new GenreDto();
-		genre.setId(id);
-		genre.setName(name);
-		return genre;
-	}
-
-	// Helper method to create MovieDto
-	private MovieDto createMovieDto(Long id,
-			String title,
-			String description,
-			Double rating,
-			LocalDate releaseDate,
-			String director,
-			String writer,
-			String stars,
-			Integer duration,
-			String imdbId,
-			Integer year,
-			Set<GenreDto> genres) {
-		MovieDto movieDto = new MovieDto();
-		movieDto.setId(id);
-		movieDto.setTitle(title);
-		movieDto.setDescription(description);
-		movieDto.setRating(rating);
-		movieDto.setReleaseDate(releaseDate);
-		movieDto.setDirector(director);
-		movieDto.setWriter(writer);
-		movieDto.setStars(stars);
-		movieDto.setDuration(duration);
-		movieDto.setImdbId(imdbId);
-		movieDto.setYear(year);
-		movieDto.setGenres(genres);
-		return movieDto;
-	}
-
-	private TVShowDto createTVShowDto(Long id,
-			String title,
-			String description,
-			Double rating,
-			LocalDate releaseDate,
-			String director,
-			String writer,
-			String stars,
-			Integer duration,
-			String imdbId,
-			Integer year,
-			List<TVSeasonDto> seasons,
-			Set<GenreDto> genres) {
-		TVShowDto show = new TVShowDto();
-		show.setId(id);
-		show.setTitle(title);
-		show.setDescription(description);
-		show.setRating(rating);
-		show.setReleaseDate(releaseDate);
-		show.setDirector(director);
-		show.setWriter(writer);
-		show.setStars(stars);
-		show.setDuration(duration);
-		show.setImdbId(imdbId);
-		show.setYear(year);
-		show.setSeasons(seasons);
-		show.setGenres(genres);
-		return show;
-	}
-
-	private TVSeasonDto createTVSeasonDto(Long id, Integer number, List<TVEpisodeDto> episodes) {
-		TVSeasonDto season = new TVSeasonDto();
-		season.setId(id);
-		season.setNumber(number);
-		season.setEpisodes(episodes);
-		return season;
-	}
-
-	private TVEpisodeDto createTVEpisodeDto(Long id,
-			String title,
-			String description,
-			Double rating,
-			LocalDate releaseDate,
-			String director,
-			String writer,
-			String stars,
-			Integer duration,
-			String imdbId,
-			Integer year,
-			Integer number) {
-		TVEpisodeDto episode = new TVEpisodeDto();
-		episode.setId(id);
-		episode.setTitle(title);
-		episode.setDescription(description);
-		episode.setRating(rating);
-		episode.setReleaseDate(releaseDate);
-		episode.setDirector(director);
-		episode.setWriter(writer);
-		episode.setStars(stars);
-		episode.setDuration(duration);
-		episode.setImdbId(imdbId);
-		episode.setYear(year);
-		episode.setNumber(number);
-		return episode;
 	}
 
 }

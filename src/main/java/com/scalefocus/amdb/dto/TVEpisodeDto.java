@@ -29,6 +29,36 @@ public class TVEpisodeDto {
 
 	private Integer number;
 
+	public TVEpisodeDto() {
+	}
+
+	public TVEpisodeDto(TVEpisodeDtoBuilder builder) {
+		this.id = builder.id;
+
+		this.title = builder.title;
+
+		this.description = builder.description;
+
+		this.rating = builder.rating;
+
+		this.releaseDate = builder.releaseDate;
+
+		this.director = builder.director;
+
+		this.writer = builder.writer;
+
+		this.stars = builder.stars;
+
+		this.duration = builder.duration;
+
+		this.imdbId = builder.imdbId;
+
+		this.year = builder.year;
+
+		this.number = builder.number;
+
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -191,6 +221,87 @@ public class TVEpisodeDto {
 		builder.append(number);
 		builder.append("]");
 		return builder.toString();
+	}
+
+	public static class TVEpisodeDtoBuilder {
+
+		private Long id;
+		private String title;
+		private String description;
+		private Double rating;
+		private LocalDate releaseDate;
+		private String director;
+		private String writer;
+		private String stars;
+		private Integer duration;
+		private String imdbId;
+		private Integer year;
+		private Integer number;
+
+		public TVEpisodeDtoBuilder id(Long id) {
+			this.id = id;
+			return this;
+		}
+
+		public TVEpisodeDtoBuilder title(String title) {
+			this.title = title;
+			return this;
+		}
+
+		public TVEpisodeDtoBuilder description(String description) {
+			this.description = description;
+			return this;
+		}
+
+		public TVEpisodeDtoBuilder rating(Double rating) {
+			this.rating = rating;
+			return this;
+		}
+
+		public TVEpisodeDtoBuilder releaseDate(LocalDate releaseDate) {
+			this.releaseDate = releaseDate;
+			return this;
+		}
+
+		public TVEpisodeDtoBuilder director(String director) {
+			this.director = director;
+			return this;
+		}
+
+		public TVEpisodeDtoBuilder writer(String writer) {
+			this.writer = writer;
+			return this;
+		}
+
+		public TVEpisodeDtoBuilder stars(String stars) {
+			this.stars = stars;
+			return this;
+		}
+
+		public TVEpisodeDtoBuilder duration(Integer duration) {
+			this.duration = duration;
+			return this;
+		}
+
+		public TVEpisodeDtoBuilder imdbId(String imdbId) {
+			this.imdbId = imdbId;
+			return this;
+		}
+
+		public TVEpisodeDtoBuilder year(Integer year) {
+			this.year = year;
+			return this;
+		}
+
+		public TVEpisodeDtoBuilder number(Integer number) {
+			this.number = number;
+			return this;
+		}
+
+		public TVEpisodeDto build() {
+			return new TVEpisodeDto(this);
+		}
+
 	}
 
 }

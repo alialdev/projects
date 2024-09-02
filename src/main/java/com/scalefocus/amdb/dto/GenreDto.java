@@ -8,6 +8,14 @@ public class GenreDto {
 
 	private String name;
 
+	public GenreDto() {
+	}
+
+	private GenreDto(Long id, String name) {
+		this.id = id;
+		this.name = name;
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -50,6 +58,32 @@ public class GenreDto {
 		builder.append(name);
 		builder.append("]");
 		return builder.toString();
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+
+		private Long id;
+
+		private String name;
+
+		public Builder id(Long id) {
+			this.id = id;
+			return this;
+		}
+
+		public Builder name(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public GenreDto build() {
+			return new GenreDto(id, name);
+		}
+
 	}
 
 }

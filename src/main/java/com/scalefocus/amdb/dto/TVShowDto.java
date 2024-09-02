@@ -10,6 +10,15 @@ public class TVShowDto extends MediaDto {
 
 	private Set<GenreDto> genres;
 
+	public TVShowDto() {
+	}
+
+	public TVShowDto(TVShowDtoBuilder builder) {
+		super(builder);
+		this.seasons = builder.seasons;
+		this.genres = builder.genres;
+	}
+
 	public List<TVSeasonDto> getSeasons() {
 		return seasons;
 	}
@@ -77,6 +86,27 @@ public class TVShowDto extends MediaDto {
 		builder.append(genres);
 		builder.append("]");
 		return builder.toString();
+	}
+
+	public static class TVShowDtoBuilder extends MediaDtoBuilder<TVShowDtoBuilder> {
+
+		private List<TVSeasonDto> seasons;
+		private Set<GenreDto> genres;
+
+		public TVShowDtoBuilder seasons(List<TVSeasonDto> seasons) {
+			this.seasons = seasons;
+			return this;
+		}
+
+		public TVShowDtoBuilder genres(Set<GenreDto> genres) {
+			this.genres = genres;
+			return this;
+		}
+
+		public TVShowDto build() {
+			return new TVShowDto(this);
+		}
+
 	}
 
 }
